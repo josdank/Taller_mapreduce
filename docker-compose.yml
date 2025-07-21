@@ -1,4 +1,5 @@
 services:
+
   preparador:
     build: .
     volumes:
@@ -8,25 +9,49 @@ services:
     build: .
     volumes:
       - .:/app
-    command: bash -c "mkdir -p output_usuarios output_mapreduce && cat splits/split_aa | python3 mapper.py > output_mapreduce/map1.txt"
+    command: >
+      bash -c "
+      mkdir -p output_usuarios output_mapreduce &&
+      cat splits/split_aa | python3 mapper.py > output_mapreduce/map1.txt &&
+      echo '🔹 Resultado del map1.txt:' $(wc -l < output_mapreduce/map1.txt) 'registros fuera de horario' > output_mapreduce/map1.out &&
+      cat output_mapreduce/map1.txt >> output_mapreduce/map1.out
+      "
 
   mapper2:
     build: .
     volumes:
       - .:/app
-    command: bash -c "mkdir -p output_usuarios output_mapreduce && cat splits/split_ab | python3 mapper.py > output_mapreduce/map2.txt"
+    command: >
+      bash -c "
+      mkdir -p output_usuarios output_mapreduce &&
+      cat splits/split_ab | python3 mapper.py > output_mapreduce/map2.txt &&
+      echo '🔹 Resultado del map2.txt:' $(wc -l < output_mapreduce/map2.txt) 'registros fuera de horario' > output_mapreduce/map2.out &&
+      cat output_mapreduce/map2.txt >> output_mapreduce/map2.out
+      "
 
   mapper3:
     build: .
     volumes:
       - .:/app
-    command: bash -c "mkdir -p output_usuarios output_mapreduce && cat splits/split_ac | python3 mapper.py > output_mapreduce/map3.txt"
+    command: >
+      bash -c "
+      mkdir -p output_usuarios output_mapreduce &&
+      cat splits/split_ac | python3 mapper.py > output_mapreduce/map3.txt &&
+      echo '🔹 Resultado del map3.txt:' $(wc -l < output_mapreduce/map3.txt) 'registros fuera de horario' > output_mapreduce/map3.out &&
+      cat output_mapreduce/map3.txt >> output_mapreduce/map3.out
+      "
 
   mapper4:
     build: .
     volumes:
       - .:/app
-    command: bash -c "mkdir -p output_usuarios output_mapreduce && cat splits/split_ad | python3 mapper.py > output_mapreduce/map4.txt"
+    command: >
+      bash -c "
+      mkdir -p output_usuarios output_mapreduce &&
+      cat splits/split_ad | python3 mapper.py > output_mapreduce/map4.txt &&
+      echo '🔹 Resultado del map4.txt:' $(wc -l < output_mapreduce/map4.txt) 'registros fuera de horario' > output_mapreduce/map4.out &&
+      cat output_mapreduce/map4.txt >> output_mapreduce/map4.out
+      "
 
   reducer:
     build: .
@@ -37,4 +62,8 @@ services:
       - mapper2
       - mapper3
       - mapper4
-    command: bash -c "mkdir -p output_mapreduce && cat output_mapreduce/map*.txt | sort | python3 reducer.py"
+    command: >
+      bash -c "
+      mkdir -p output_mapreduce &&
+      cat output_mapreduce/map*.txt | sort | python3 reducer.py
+      "
