@@ -1,0 +1,37 @@
+version: '3.9'
+
+services:
+  mapper1:
+    build: .
+    volumes:
+      - .:/app
+    command: bash -c "cat splits/split_aa | python3 mapper.py > output_mapreduce/map1.txt"
+
+  mapper2:
+    build: .
+    volumes:
+      - .:/app
+    command: bash -c "cat splits/split_ab | python3 mapper.py > output_mapreduce/map2.txt"
+
+  mapper3:
+    build: .
+    volumes:
+      - .:/app
+    command: bash -c "cat splits/split_ac | python3 mapper.py > output_mapreduce/map3.txt"
+
+  mapper4:
+    build: .
+    volumes:
+      - .:/app
+    command: bash -c "cat splits/split_ad | python3 mapper.py > output_mapreduce/map4.txt"
+
+  reducer:
+    build: .
+    volumes:
+      - .:/app
+    depends_on:
+      - mapper1
+      - mapper2
+      - mapper3
+      - mapper4
+    command: bash -c "cat output_mapreduce/map*.txt | sort | python3 reducer.py"
