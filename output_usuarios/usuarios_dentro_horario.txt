@@ -1,3 +1,4 @@
+🔹 Usuarios DENTRO del horario laboral: 0 accesos
 2025-07-20 08:30:15 usuario:pedro
 2025-07-20 09:45:00 usuario:luis
 2025-07-20 17:59:59 usuario:carla
