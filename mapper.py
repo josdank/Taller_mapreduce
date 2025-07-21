@@ -3,12 +3,13 @@ import sys
 import os
 from datetime import datetime
 
-# Asegurar que los directorios existen
-os.makedirs("output_usuarios", exist_ok=True)
+# Preparar variables
+fuera_conteo = 0
+dentro_conteo = 0
+fuera_lineas = []
+dentro_lineas = []
 
-fuera = open("output_usuarios/usuarios_fuera_horario.txt", "a")
-dentro = open("output_usuarios/usuarios_dentro_horario.txt", "a")
-
+# Leer y procesar líneas
 for line in sys.stdin:
     try:
         line = line.strip()
@@ -16,36 +17,31 @@ for line in sys.stdin:
             continue
 
         partes = line.split()
-
-        # Verifica que tenga 3 partes
         if len(partes) != 3:
-            print(f"Línea inválida: {line}", file=sys.stderr)
             continue
 
         fecha, hora, usuario_raw = partes
-
-        # Formato de hora correcto
         hora_dt = datetime.strptime(hora, "%H:%M:%S").time()
+        usuario = usuario_raw.split(":")[1] if usuario_raw.startswith("usuario:") else "desconocido"
 
-        # Extraer el nombre del usuario
-        if not usuario_raw.startswith("usuario:"):
-            print(f"Formato de usuario inválido: {line}", file=sys.stderr)
-            continue
-
-        usuario = usuario_raw.split(":")[1]
-
-        # Clasificar horario
-        inicio = datetime.strptime("08:00:00", "%H:%M:%S").time()
-        fin = datetime.strptime("18:00:00", "%H:%M:%S").time()
-
-        if hora_dt < inicio or hora_dt > fin:
-            fuera.write(f"{fecha} {hora} usuario:{usuario}\n")
+        if hora_dt < datetime.strptime("08:00:00", "%H:%M:%S").time() or hora_dt > datetime.strptime("18:00:00", "%H:%M:%S").time():
+            fuera_lineas.append(f"{fecha} {hora} usuario:{usuario}")
             print(f"{usuario}\t1")
+            fuera_conteo += 1
         else:
-            dentro.write(f"{fecha} {hora} usuario:{usuario}\n")
+            dentro_lineas.append(f"{fecha} {hora} usuario:{usuario}")
+            dentro_conteo += 1
+    except:
+        continue
 
-    except Exception as e:
-        print(f"Error procesando línea: {line} - {e}", file=sys.stderr)
+# Crear carpetas
+os.makedirs("output_usuarios", exist_ok=True)
 
-fuera.close()
-dentro.close()
+# Escribir archivos con encabezado
+with open("output_usuarios/usuarios_fuera_horario.txt", "w", encoding="utf-8") as f:
+    f.write(f"🔹 Usuarios FUERA del horario laboral: {fuera_conteo} accesos\n")
+    f.write("\n".join(fuera_lineas))
+
+with open("output_usuarios/usuarios_dentro_horario.txt", "w", encoding="utf-8") as f:
+    f.write(f"🔹 Usuarios DENTRO del horario laboral: {dentro_conteo} accesos\n")
+    f.write("\n".join(dentro_lineas))
