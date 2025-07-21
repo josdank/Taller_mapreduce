@@ -1,4 +1,9 @@
 services:
+  preparador:
+    build: .
+    volumes:
+      - .:/app
+    command: bash -c "./split_logs.sh"
   mapper1:
     build: .
     volumes:
